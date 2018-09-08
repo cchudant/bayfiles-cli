@@ -27,9 +27,9 @@ require('yargs').command(
   async ({ site, files, quiet }) => {
     for (const file of files) {
       try {
-        if(quiet) console.log(yellow(`Uploading ${file}...`))
+        if(!quiet) console.log(yellow(`Uploading ${file}...`))
         const result = await upload(site, join(process.cwd(), file))
-        if(quiet) {
+        if(!quiet) {
           console.log(green(`File uploaded successfully: ${result.url.full}`))
         } else {
           console.log(result.url.full)
