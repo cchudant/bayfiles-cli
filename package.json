@@ -1,0 +1,39 @@
+{
+  "name": "bayfiles-cli",
+  "version": "1.0.0",
+  "description": "a cli for bayfiles.com, anonfile.com and megaupload.nz",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/cli.js",
+    "format": "prettier --write index.js src/**/**.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SkyBeastMC/bayfiles-cli.git"
+  },
+  "keywords": [
+    "bayfiles",
+    "cli",
+    "anonfile",
+    "megaupload",
+    "nodejs",
+    "upload"
+  ],
+  "author": "SkyBeast",
+  "license": "MIT",
+  "bin": {
+    "bayfiles": "./src/cli.js"
+  },
+  "bugs": {
+    "url": "https://github.com/SkyBeastMC/bayfiles-cli/issues"
+  },
+  "homepage": "https://github.com/SkyBeastMC/bayfiles-cli#readme",
+  "dependencies": {
+    "form-data": "^2.3.2",
+    "node-fetch": "^2.2.0",
+    "yargs": "^12.0.2"
+  },
+  "devDependencies": {
+    "prettier": "^1.14.2"
+  }
+}
