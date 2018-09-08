@@ -22,9 +22,9 @@ require('yargs').command(
   async ({ site, files }) => {
     for (const file of files) {
       try {
-        console.log(yellow(`Uploading ${file}`))
+        console.log(yellow(`Uploading ${file}...`))
         const result = await upload(site, join(process.cwd(), file))
-        console.log(green(`File uploaded successfully ${result.url.full}`))
+        console.log(green(`File uploaded successfully: ${result.url.full}`))
       } catch (e) {
         console.error(red(`An error occurred when uploading the file: ${e.message}`))
       }
