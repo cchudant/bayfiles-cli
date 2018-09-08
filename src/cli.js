@@ -18,18 +18,18 @@ require('yargs').command(
         choices: ['bayfiles', 'anonfile', 'megaupload'],
         default: 'bayfiles'
       })
-      .option('verbose', {
-        alias: 'v',
-        describe: 'If this option is set to true, log messages won\'t appear',
+      .option('quiet', {
+        alias: 'q',
+        describe: 'If this option is set to false, log messages won\'t appear',
         default: false
       })
   },
-  async ({ site, files, verbose }) => {
+  async ({ site, files, quiet }) => {
     for (const file of files) {
       try {
-        if(verbose) console.log(yellow(`Uploading ${file}...`))
+        if(quiet) console.log(yellow(`Uploading ${file}...`))
         const result = await upload(site, join(process.cwd(), file))
-        if(verbose) {
+        if(quiet) {
           console.log(green(`File uploaded successfully: ${result.url.full}`))
         } else {
           console.log(result.url.full)
