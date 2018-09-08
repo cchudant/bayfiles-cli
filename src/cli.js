@@ -18,13 +18,22 @@ require('yargs').command(
         choices: ['bayfiles', 'anonfile', 'megaupload'],
         default: 'bayfiles'
       })
+      .option('verbose', {
+        alias: 'v',
+        describe: 'If this option is set to true, log messages won\'t appear',
+        default: false
+      })
   },
-  async ({ site, files }) => {
+  async ({ site, files, verbose }) => {
     for (const file of files) {
       try {
-        console.log(yellow(`Uploading ${file}...`))
+        if(verbose) console.log(yellow(`Uploading ${file}...`))
         const result = await upload(site, join(process.cwd(), file))
-        console.log(green(`File uploaded successfully: ${result.url.full}`))
+        if(verbose) {
+          console.log(green(`File uploaded successfully: ${result.url.full}`))
+        } else {
+          console.log(result.url.full)
+        }
       } catch (e) {
         console.error(red(`An error occurred when uploading the file: ${e.message}`))
       }
