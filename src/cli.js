@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const upload = require('./upload')
 const { join } = require('path')
+const { red, green, yellow } = require('colors')
 
 require('yargs').command(
   '$0 <files...>',
@@ -19,14 +20,13 @@ require('yargs').command(
       })
   },
   async ({ site, files }) => {
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-
+    for (const file of files) {
       try {
+        console.log(yellow(`Uploading ${file}`))
         const result = await upload(site, join(process.cwd(), file))
-        console.log(`${result.url.full}`)
+        console.log(green(`File uploaded successfully ${result.url.full}`))
       } catch (e) {
-        console.error(`${e.message}`)
+        console.error(red(`An error occurred when uploading the file: ${e.message}`))
       }
     }
   }
