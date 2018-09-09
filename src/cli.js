@@ -30,7 +30,7 @@ require('yargs').command(
       })
   },
   async ({ site, files, quiet, w: writeTo }) => {
-    writeTo = writeTo && fs.createWriteStream(writeTo, { flags: 'a' })
+    writeTo = writeTo && fs.createWriteStream(join(process.cwd(), writeTo), { flags: 'a' })
 
     for (const file of files) {
       try {
