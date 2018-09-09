@@ -32,10 +32,16 @@ async function upload(api, file) {
     const form = new FormData()
     form.append('file', file)
 
-    const res = await fetch(api, {
-      method: 'POST',
-      body: form
-    })
+    let res
+    try {
+      res = await fetch(api, {
+        method: 'POST',
+        body: form
+      })
+    } catch (e) {
+      e.httpError = true
+      throw e
+    }
 
     if (!res.ok && res.status !== 400)
       throw new Error(

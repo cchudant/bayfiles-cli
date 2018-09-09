@@ -6,6 +6,8 @@ const fs = require('fs')
 const util = require('util')
 
 const fsRemove = util.promisify(fs.unlink)
+const fsStat = util.promisify(fs.stat)
+const fsReaddir = util.promisify(fs.readdir)
 
 require('yargs').command(
   '$0 <files...>',
@@ -35,13 +37,33 @@ require('yargs').command(
         describe: 'Delete the file after upload',
         type: 'boolean'
       })
+      .option('retry', {
+        alias: 't',
+        describe: 'Retry if an http error occurs',
+        type: 'boolean'
+      })
+      .option('recursive', {
+        alias: 'r',
+        describe: 'Step in directories',
+        type: 'boolean'
+      })
   },
-  async ({ site, files, quiet, w: writeTo, 'delete-file': deleteFile }) => {
+  async ({ site, files, quiet, w: writeTo, 'delete-file': deleteFile, recursive, retry }) => {
     writeTo = writeTo && fs.createWriteStream(join(process.cwd(), writeTo), { flags: 'a' })
 
     !quiet && deleteFile && console.log(yellow('Warning: the files will be deleted once uploaded'))
 
-    for (const file of files) {
+    while (files.length) {
+      const file = files.shift()
+
+      // Step in directories
+      if ((await fsStat(file)).isDirectory()) {
+        if (!recursive) console.error(red(`File ${file} is a directory`))
+        else files.push(...(await fsReaddir(file)).map(f => join(file, f)))
+
+        continue
+      }
+
       try {
         if (!quiet) console.log(yellow(`Uploading ${file}...`))
         const result = await upload(site, join(process.cwd(), file))
@@ -51,13 +73,17 @@ require('yargs').command(
           console.log(result.url.full)
         }
 
-        writeTo && writeTo.write(result.url.full + "\n")
+        writeTo && writeTo.write(result.url.full + '\n')
 
         if (deleteFile)
           await fsRemove(join(process.cwd(), file))
 
       } catch (e) {
-        console.error(red(`An error occurred when uploading the file: ${e.message}`))
+        console.error(red(`An error occurred when uploading ${file}: ${e.message}`))
+        if (retry && e.httpError) {
+          console.log(yellow('Retrying...'))
+          files = [file, ...files]
+        }
       }
     }
 
