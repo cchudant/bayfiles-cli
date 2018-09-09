@@ -3,14 +3,17 @@ const upload = require('./upload')
 const { join } = require('path')
 const { red, green, yellow } = require('colors')
 const fs = require('fs')
+const util = require('util')
+
+const fsRemove = util.promisify(fs.unlink)
 
 require('yargs').command(
   '$0 <files...>',
-  'upload one or multiple files',
+  'Upload one or multiple files',
   yargs => {
     yargs
-      .positional('file', {
-        describe: 'The file to upload',
+      .positional('files', {
+        describe: 'The files to upload',
         type: 'string'
       })
       .option('site', {
@@ -28,9 +31,15 @@ require('yargs').command(
         alias: 'w',
         describe: 'Append the urls to a file'
       })
+      .option('delete-file', {
+        describe: 'Delete the file after upload',
+        type: 'boolean'
+      })
   },
-  async ({ site, files, quiet, w: writeTo }) => {
+  async ({ site, files, quiet, w: writeTo, 'delete-file': deleteFile }) => {
     writeTo = writeTo && fs.createWriteStream(join(process.cwd(), writeTo), { flags: 'a' })
+
+    !quiet && deleteFile && console.log(yellow('Warning: the files will be deleted once uploaded'))
 
     for (const file of files) {
       try {
@@ -43,6 +52,10 @@ require('yargs').command(
         }
 
         writeTo && writeTo.write(result.url.full + "\n")
+
+        if (deleteFile)
+          await fsRemove(join(process.cwd(), file))
+
       } catch (e) {
         console.error(red(`An error occurred when uploading the file: ${e.message}`))
       }
