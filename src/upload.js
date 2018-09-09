@@ -13,37 +13,43 @@ const apiUrls = {
 }
 
 async function upload(api, file) {
-  if (!api || !api.match(/^https?:\/\//)) {
-    if (!apiUrls[api]) throw new Error('Api url is not valid.')
+  let opened
+  try {
+    if (!api || !api.match(/^https?:\/\//)) {
+      if (!apiUrls[api]) throw new Error('Api url is not valid.')
 
-    api = apiUrls[api]
+      api = apiUrls[api]
+    }
+
+    if (!file || typeof file === 'string') {
+      if (!(await exists(file)) || !(await stat(file)).isFile())
+        throw new Error('File does not exist or is not a file.')
+
+      file = fs.createReadStream(file)
+      opened = true
+    }
+
+    const form = new FormData()
+    form.append('file', file)
+
+    const res = await fetch(api, {
+      method: 'POST',
+      body: form
+    })
+
+    if (!res.ok && res.status !== 400)
+      throw new Error(
+        `Upload not ok: status ${res.status}, content: ${await res.text()}.`
+      )
+
+    const json = await res.json()
+    if (!json.status)
+      throw new BayfileError(json.error.message, json.error.type, json.error.code)
+
+    return json.data.file
+  } finally {
+    opened && file.close() 
   }
-
-  if (!file || typeof file === 'string') {
-    if (!(await exists(file)) || !(await stat(file)).isFile())
-      throw new Error('File does not exist or is not a file.')
-
-    file = fs.createReadStream(file)
-  }
-
-  const form = new FormData()
-  form.append('file', file)
-
-  const res = await fetch(api, {
-    method: 'POST',
-    body: form
-  })
-
-  if (!res.ok && res.status !== 400)
-    throw new Error(
-      `Upload not ok: status ${res.status}, content: ${await res.text()}.`
-    )
-
-  const json = await res.json()
-  if (!json.status)
-    throw new BayfileError(json.error.message, json.error.type, json.error.code)
-
-  return json.data.file
 }
 
 class BayfileError extends Error {
