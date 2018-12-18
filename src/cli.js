@@ -5,6 +5,8 @@ const { red, green, yellow } = require('colors')
 const fs = require('fs')
 const util = require('util')
 
+const websites = Object.keys(upload.apiUrls)
+
 const fsRemove = util.promisify(fs.unlink)
 const fsStat = util.promisify(fs.stat)
 const fsReaddir = util.promisify(fs.readdir)
@@ -20,21 +22,21 @@ require('yargs').command(
       })
       .option('site', {
         alias: 's',
-        describe: 'Site to upload',
-        choices: ['bayfiles', 'anonfile', 'megaupload'],
-        default: 'bayfiles'
+        describe: 'Website to upload',
+        choices: websites,
+        default: websites[0]
       })
       .option('quiet', {
         alias: 'q',
-        describe: 'If set, log messages won\'t appear',
+        describe: 'If set, log messages won\'t be shown',
         type: 'boolean'
       })
       .option('write-to-file', {
         alias: 'w',
         describe: 'Append the urls to a file'
       })
-      .option('delete-file', {
-        describe: 'Delete the file after upload',
+      .option('delete-files', {
+        describe: 'Delete files after upload',
         type: 'boolean'
       })
       .option('retry', {
@@ -48,10 +50,10 @@ require('yargs').command(
         type: 'boolean'
       })
   },
-  async ({ site, files, quiet, w: writeTo, 'delete-file': deleteFile, recursive, retry }) => {
+  async ({ site, files, quiet, w: writeTo, 'delete-files': deleteFiles, recursive, retry }) => {
     writeTo = writeTo && fs.createWriteStream(join(process.cwd(), writeTo), { flags: 'a' })
 
-    !quiet && deleteFile && console.log(yellow('Warning: the files will be deleted once uploaded'))
+    !quiet && deleteFiles && console.log(yellow('Warning: the files will be deleted once uploaded'))
 
     while (files.length) {
       const file = files.shift()
@@ -75,11 +77,15 @@ require('yargs').command(
 
         writeTo && writeTo.write(result.url.full + '\n')
 
-        if (deleteFile)
+        if (deleteFiles)
           await fsRemove(join(process.cwd(), file))
 
       } catch (e) {
-        console.error(red(`An error occurred when uploading ${file}: ${e.message}`))
+        if (e instanceof upload.BayfileError)
+          console.error(red(`Website returned error for file ${file}: ${e.message} (error type ${e.type}, code ${e.code})`))
+        else
+          console.error(red(`An error occurred when uploading ${file}: ${e.message}`))
+
         if (retry && e.httpError) {
           console.log(yellow('Retrying...'))
           files = [file, ...files]

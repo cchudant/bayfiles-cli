@@ -17,11 +17,11 @@ Positionals:
 Options:
   --help               Show help                                       [boolean]
   --version            Show version number                             [boolean]
-  --site, -s           Site to upload
+  --site, -s           Website to upload
            [choices: "bayfiles", "anonfile", "megaupload"] [default: "bayfiles"]
   --quiet, -q          If set, log messages won't appear               [boolean]
   --write-to-file, -w  Append the urls to a file
-  --delete-file        Delete the file after upload                    [boolean]
+  --delete-files       Delete files after upload                       [boolean]
   --retry, -t          Retry if an http error occurs                   [boolean]
   --recursive, -r      Step in directories                             [boolean]
 
