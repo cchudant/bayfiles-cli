@@ -1,5 +1,5 @@
 # bayfiles-cli
-A cli for [bayfiles.com](https://bayfiles.com/), [anonfile.com](https://anonfile.com/), [megaupload.nz](https://megaupload.nz/) and [forumfiles](https://forumfiles.com/api/upload) file uploading and downloading.
+A cli for [bayfiles.com](https://bayfiles.com/), [anonfile.com](https://anonfile.com/), [megaupload.nz](https://megaupload.nz/) and [forumfiles.com](https://forumfiles.com/api/upload) file uploading and downloading.
 
 # Installation
 `npm i -g bayfiles-cli`
@@ -7,7 +7,7 @@ A cli for [bayfiles.com](https://bayfiles.com/), [anonfile.com](https://anonfile
 # Usage (upload)
 ```
 $ bayfilesupload
-bayfiles <files...>
+bayfilesupload <files...>
 
 Upload one or multiple files
 
