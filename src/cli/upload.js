@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-const upload = require('./upload')
+const { apiUrls, upload, BayfilesError } = require('..')
 const { join } = require('path')
 const { red, green, yellow } = require('colors')
 const fs = require('fs')
 const util = require('util')
 
-const websites = Object.keys(upload.apiUrls)
+const websites = Object.keys(apiUrls)
 
 const fsRemove = util.promisify(fs.unlink)
 const fsStat = util.promisify(fs.stat)
@@ -28,7 +28,7 @@ require('yargs').command(
       })
       .option('quiet', {
         alias: 'q',
-        describe: 'If set, log messages won\'t be shown',
+        describe: "If set, log messages won't be shown",
         type: 'boolean'
       })
       .option('write-to-file', {
@@ -50,10 +50,22 @@ require('yargs').command(
         type: 'boolean'
       })
   },
-  async ({ site, files, quiet, w: writeTo, 'delete-files': deleteFiles, recursive, retry }) => {
-    writeTo = writeTo && fs.createWriteStream(join(process.cwd(), writeTo), { flags: 'a' })
+  async ({
+    site,
+    files,
+    quiet,
+    w: writeTo,
+    'delete-files': deleteFiles,
+    recursive,
+    retry
+  }) => {
+    writeTo =
+      writeTo &&
+      fs.createWriteStream(join(process.cwd(), writeTo), { flags: 'a' })
 
-    !quiet && deleteFiles && console.log(yellow('Warning: the files will be deleted once uploaded'))
+    !quiet &&
+      deleteFiles &&
+      console.warn(yellow('Warning: the files will be deleted once uploaded'))
 
     while (files.length) {
       const file = files.shift()
@@ -67,28 +79,33 @@ require('yargs').command(
       }
 
       try {
-        if (!quiet) console.log(yellow(`Uploading ${file}...`))
+        !quiet && console.log(yellow(`Uploading ${file}...`))
+
         const result = await upload(site, join(process.cwd(), file))
-        if (!quiet) {
+        if (!quiet)
           console.log(green(`File uploaded successfully: ${result.url.full}`))
-        } else {
-          console.log(result.url.full)
-        }
+        else console.log(result.url.full)
 
         writeTo && writeTo.write(result.url.full + '\n')
 
-        if (deleteFiles)
-          await fsRemove(join(process.cwd(), file))
-
+        if (deleteFiles) await fsRemove(join(process.cwd(), file))
       } catch (e) {
-        if (e instanceof upload.BayfileError)
-          console.error(red(`Website returned error for file ${file}: ${e.message} (error type ${e.type}, code ${e.code})`))
+        if (e instanceof BayfileError)
+          console.error(
+            red(
+              `Website returned error for file ${file}: ${
+                e.message
+              } (error type ${e.type}, code ${e.code})`
+            )
+          )
         else
-          console.error(red(`An error occurred when uploading ${file}: ${e.message}`))
+          console.error(
+            red(`An error occurred when uploading ${file}: ${e.message}`)
+          )
 
-        if (retry && e.httpError) {
-          console.log(yellow('Retrying...'))
-          files = [file, ...files]
+        if (retry) {
+          !quiet && console.log(yellow('Retrying...'))
+          files.unshift(file)
         }
       }
     }
@@ -96,3 +113,5 @@ require('yargs').command(
     writeTo && writeTo.close()
   }
 ).argv
+
+process.on('unhandledRejection', console.error)
