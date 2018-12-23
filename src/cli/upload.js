@@ -13,8 +13,8 @@ const fsReaddir = util.promisify(fs.readdir)
 
 require('yargs').command(
   '$0 <files...>',
-  'Upload one or multiple files',
-  yargs => {
+  'Upload one or more files',
+  yargs =>
     yargs
       .positional('files', {
         describe: 'The files to upload',
@@ -48,8 +48,7 @@ require('yargs').command(
         alias: 'r',
         describe: 'Step in directories',
         type: 'boolean'
-      })
-  },
+      }),
   async ({
     site,
     files,
@@ -113,5 +112,3 @@ require('yargs').command(
     writeTo && writeTo.close()
   }
 ).argv
-
-process.on('unhandledRejection', console.error)

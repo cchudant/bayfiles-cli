@@ -7,41 +7,34 @@ const util = require('util')
 
 const fsReadFile = util.promisify(fs.readFile)
 
-require('yargs').command(
+require('yargs')
+.command(
   '$0 <urls...>',
-  'Download one or multiple files',
-  yargs => {
-    yargs
-      .positional('urls', {
-        describe: 'The uploaded files to download',
-        type: 'string'
-      })
-      .option('quiet', {
-        alias: 'q',
-        describe: "If set, log messages won't be shown",
-        type: 'boolean'
-      })
-      .option('read-from-file', {
-        alias: 'r',
-        describe: 'Read the urls from a file'
-      })
-      .option('retry', {
-        alias: 't',
-        describe: 'Retry if an http error occurs',
-        type: 'boolean'
-      })
-      .option('output', {
-        alias: 'o',
-        describe: 'Where to put the downloaded files'
-      })
-  },
-  async ({ urls, quiet, r: readFrom, retry, output }) => {
-    if (readFrom)
-      urls.push(
-        ...(await fsReadFile(join(process.cwd(), readFrom))
+  'Download one or more files',
+  yargs => yargs
+    .positional('urls', {
+      describe: 'The uploaded files to download or a file name where to find ',
+      type: 'string'
+    })
+    .option('quiet', {
+      alias: 'q',
+      describe: "If set, log messages won't be shown",
+      type: 'boolean'
+    })
+    .option('retry', {
+      alias: 't',
+      describe: 'Retry if an http error occurs',
+      type: 'boolean'
+    })
+    .option('output', {
+      alias: 'o',
+      describe: 'Where to put the downloaded files'
+    }),
+  async ({ urls, quiet, retry, output }) => {
+    if (urls.length === 1 && !urls[0].match(/^https?:\/\//))
+      urls = (await fsReadFile(join(process.cwd(), urls[0])))
           .toString()
-          .split('\n'))
-      )
+          .split('\n')
 
     output = output || process.cwd()
 
@@ -86,6 +79,3 @@ require('yargs').command(
     }
   }
 ).argv
-
-process.on('unhandledRejection', console.error)
-process.on('uncaughtException', console.error)

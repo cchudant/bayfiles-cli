@@ -1,7 +1,7 @@
 {
   "name": "bayfiles-cli",
-  "version": "2.0.0",
-  "description": "a cli for bayfiles.com, anonfile.com and megaupload.nz",
+  "version": "2.0.1",
+  "description": "a cli for bayfiles.com, anonfile.com, megaupload.nz and forumfiles.com",
   "main": "index.js",
   "scripts": {
     "start": "node src/cli.js",
