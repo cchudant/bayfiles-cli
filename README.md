@@ -1,12 +1,12 @@
 # bayfiles-cli
-A cli for [bayfiles.com](https://bayfiles.com/), [anonfile.com](https://anonfile.com/) and [megaupload.nz](https://megaupload.nz/) file uploading.
+A cli for [bayfiles.com](https://bayfiles.com/), [anonfile.com](https://anonfile.com/), [megaupload.nz](https://megaupload.nz/) and [forumfiles](https://forumfiles.com/api/upload) file uploading and downloading.
 
 # Installation
 `npm i -g bayfiles-cli`
 
-# Usage
+# Usage (upload)
 ```
-$ bayfiles
+$ bayfilesupload
 bayfiles <files...>
 
 Upload one or multiple files
@@ -25,6 +25,27 @@ Options:
   --delete-files       Delete files after upload                       [boolean]
   --retry, -t          Retry if an http error occurs                   [boolean]
   --recursive, -r      Step in directories                             [boolean]
+
+Not enough non-option arguments: got 0, need at least 1
+```
+
+# Usage (download)
+```
+$ bayfilesdownload
+bayfilesdownload <urls...>
+
+Download one or multiple files
+
+Positionals:
+  urls  The uploaded files to download                                  [string]
+
+Options:
+  --help                Show help                                      [boolean]
+  --version             Show version number                            [boolean]
+  --quiet, -q           If set, log messages won't be shown            [boolean]
+  --read-from-file, -r  Read the urls from a file
+  --retry, -t           Retry if an http error occurs                  [boolean]
+  --output, -o          Where to put the downloaded files
 
 Not enough non-option arguments: got 0, need at least 1
 ```

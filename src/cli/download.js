@@ -9,7 +9,7 @@ const fsReadFile = util.promisify(fs.readFile)
 
 require('yargs').command(
   '$0 <urls...>',
-  'Upload one or multiple files',
+  'Download one or multiple files',
   yargs => {
     yargs
       .positional('urls', {
