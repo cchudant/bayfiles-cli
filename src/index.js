@@ -11,10 +11,9 @@ const stat = util.promisify(fs.stat)
  * An object that maps website names to api urls.
  */
 const apiUrls = {
-  bayfiles: 'https://bayfiles.com/api/upload',
-  anonfile: 'https://anonfile.com/api/upload',
-  megaupload: 'https://megaupload.nz/api/upload',
-  forumfiles: 'https://forumfiles.com/api/upload'
+  bayfiles: 'https://api.bayfiles.com/upload',
+  anonfile: 'https://api.anonfile.com/upload',
+  forumfiles: 'https://api.forumfiles.com/upload'
 }
 
 /**
